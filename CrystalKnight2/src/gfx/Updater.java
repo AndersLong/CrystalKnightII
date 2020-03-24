@@ -21,9 +21,12 @@ public class Updater {
 			break;
 		case HELP:
 			break;
-		case GAME:
+		case BATTLE2D:
 			cycler.update();
-			break;		
+			break;	
+		case OVERWORLD:
+			cycler.update();
+			break;
 		}
 	}
 

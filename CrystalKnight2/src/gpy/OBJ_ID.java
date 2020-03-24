@@ -2,5 +2,7 @@ package gpy;
 
 public enum OBJ_ID {
 	PLAYER,
-	BLOCK;
+	BLOCK,
+	GOBLIN1,
+	SWORD;
 }

@@ -2,46 +2,27 @@ package inp;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.HashSet;
+import java.util.Set;
 
 public class KeyWatcher implements KeyListener{
 
-	public static boolean lkd,rkd,dkd,ukd;
+	public static Set<Character> pressed = new HashSet<>();
+	public static boolean spaceAlreadyPressed;
 
 	public KeyWatcher() {
-		lkd = false;
-		rkd = false;
-		dkd = false;
-		ukd = false;		
+		spaceAlreadyPressed = false;
 	}
 
-	public void keyPressed(KeyEvent e) {
-		if(e.getKeyCode() == e.VK_LEFT) {
-			lkd = true;
-		}
-		else if(e.getKeyCode() == e.VK_RIGHT) {
-			rkd = true;
-		}
-		else if(e.getKeyCode() == e.VK_UP) {
-			ukd = true;
-		}
-		else if(e.getKeyCode() == e.VK_DOWN) {
-			dkd = true;
-		}
+	public synchronized void keyPressed(KeyEvent e) {
+		pressed.add(e.getKeyChar());
 	}
 
 
-	public void keyReleased(KeyEvent e) {
-		if(e.getKeyCode() == e.VK_LEFT) {
-			lkd = false;
-		}
-		else if(e.getKeyCode() == e.VK_RIGHT) {
-			rkd = false;
-		}
-		else if(e.getKeyCode() == e.VK_UP) {
-			ukd = false;
-		}
-		else if(e.getKeyCode() == e.VK_DOWN) {
-			dkd = false;
+	public synchronized void keyReleased(KeyEvent e) {
+		pressed.remove(e.getKeyChar());
+		if(e.getKeyChar() == ' ') {
+			KeyWatcher.spaceAlreadyPressed = false;
 		}
 	}
 

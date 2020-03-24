@@ -3,5 +3,6 @@ package stt;
 public enum GAME_STATE {
 	START,
 	HELP,
-	GAME
+	BATTLE2D,
+	OVERWORLD;
 }

@@ -1,6 +1,11 @@
 package gpy;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+
+import stt.DIR;
+import stt.OBJ_STATE;
 
 
 public abstract class GameObject extends Locatable{
@@ -9,6 +14,8 @@ public abstract class GameObject extends Locatable{
 	protected int xv,yv;
 	protected Cycler cycler;
 	protected OBJ_ID id;
+	protected OBJ_STATE stt;
+	protected Rectangle battleCollider;
 	
 	public GameObject(int x, int y, int xv, int yv, Cycler cycler, OBJ_ID id) {
 		super(x, y);
@@ -16,6 +23,7 @@ public abstract class GameObject extends Locatable{
 		this.yv = yv;
 		this.cycler = cycler;
 		this.id = id;
+		this.stt = OBJ_STATE.NORM;
 	}
 
 	public GameObject(int x, int y, Cycler cycler, OBJ_ID id) {
@@ -25,11 +33,75 @@ public abstract class GameObject extends Locatable{
 	public abstract void update();
 	
 	public abstract void draw(Graphics g);
-
+	
+	public void drawImg(Graphics g, BufferedImage img) {
+		g.drawImage(img, x, y, w, h, null);
+	}
+	
+	public boolean touchingInstanceOf(OBJ_ID otherId,DIR side) {
+		for(GameObject b: cycler.getObjs()) {
+			if(b.getId()==otherId) {
+				if(touching(b,side)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean touching(GameObject b,DIR side) {
+		switch(side) {
+		case DOWN:
+			if((this.getX()+this.getW()/8>b.getX()&&this.getX()+this.getW()/8<b.getX()+b.getW()) ||  
+					(this.getX()+this.getW()*7/8>b.getX()&&this.getX()+this.getW()*7/8<b.getX()+b.getW())){
+				if(this.getY()+this.getH()+this.getYv()>b.getY()&&this.getY()+this.getH()+this.getYv()<b.getY()+b.getH()) {
+					return true;
+				}
+			}
+			break;
+		case UP:
+			if((this.getX()+this.getW()/8>b.getX()&&this.getX()+this.getW()/8<b.getX()+b.getW()) ||  
+					(this.getX()+this.getW()*7/8>b.getX()&&this.getX()+this.getW()*7/8<b.getX()+b.getW())){
+				if(this.getY()+this.getYv()>b.getY()&&this.getY()+this.getYv()<b.getY()+b.getH()) {
+					return true;
+				}
+			}
+			break;
+		case LEFT:
+			if((this.getY()+this.getH()/8>b.getY() && this.getY()+this.getH()/8<b.getY()+b.getH())
+					|| (this.getY()+this.getH()*7/8>b.getY() && this.getY()+this.getH()*7/8<b.getY()+b.getH())) {
+				if(this.getX()+this.getXv()>b.getX() && this.getX()+this.getXv()<b.getX()+b.getW()) {
+					return true;
+				}
+			}
+			break;
+		case RIGHT:
+			if(((this.getY()+this.getH()/8>b.getY()) && (this.getY()+this.getH()/8<b.getY()+b.getH()))
+					|| (this.getY()+this.getH()*7/8>b.getY()) && (this.getY()+this.getH()*7/8<b.getY()+b.getH())) {
+				if((this.getX()+this.getW()+this.getXv()>b.getX()) && (this.getX()+this.getW()+this.getXv()<b.getX()+b.getW())) {
+					return true;
+				}
+			}
+			break;
+		}		
+		return false;
+	}
+	
+	public boolean battleCollideWith(OBJ_ID id) {
+		for(GameObject b: cycler.getObjs()) {
+			if(b.getId()==id) {
+				if(this.battleCollider.intersects(b.battleCollider)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	public boolean isLcol() {
 		return lcol;
 	}
-
+	
 	public void setLcol(boolean lcol) {
 		this.lcol = lcol;
 	}
@@ -80,56 +152,16 @@ public abstract class GameObject extends Locatable{
 
 	public void setId(OBJ_ID id) {
 		this.id = id;
+	}
+
+	public OBJ_STATE getStt() {
+		return stt;
+	}
+
+	public void setStt(OBJ_STATE stt) {
+		this.stt = stt;
 	}	
 	
-	public boolean touchingInstanceOf(OBJ_ID otherId,String side) {
-		for(GameObject b: cycler.getObjs()) {
-			if(b.getId()==otherId) {
-				if(touching(b,side)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	private boolean touching(GameObject b,String collider) {
-		switch(collider) {
-		case "down":
-			if((this.getX()+this.getW()/8>b.getX()&&this.getX()+this.getW()/8<b.getX()+b.getW()) ||  
-					(this.getX()+this.getW()*7/8>b.getX()&&this.getX()+this.getW()*7/8<b.getX()+b.getW())){
-				if(this.getY()+this.getH()+this.getYv()>b.getY()&&this.getY()+this.getH()+this.getYv()<b.getY()+b.getH()) {
-					return true;
-				}
-			}
-			break;
-		case "up":
-			if((this.getX()+this.getW()/8>b.getX()&&this.getX()+this.getW()/8<b.getX()+b.getW()) ||  
-					(this.getX()+this.getW()*7/8>b.getX()&&this.getX()+this.getW()*7/8<b.getX()+b.getW())){
-				if(this.getY()+this.getYv()>b.getY()&&this.getY()+this.getYv()<b.getY()+b.getH()) {
-					return true;
-				}
-			}
-			break;
-		case "left":
-			if((this.getY()+this.getH()/8>b.getY() && this.getY()+this.getH()/8<b.getY()+b.getH())
-					|| (this.getY()+this.getH()*7/8>b.getY() && this.getY()+this.getH()*7/8<b.getY()+b.getH())) {
-				if(this.getX()+this.getXv()>b.getX() && this.getX()+this.getXv()<b.getX()+b.getW()) {
-					return true;
-				}
-			}
-			break;
-		case "right":
-			if(((this.getY()+this.getH()/8>b.getY()) && (this.getY()+this.getH()/8<b.getY()+b.getH()))
-					|| (this.getY()+this.getH()*7/8>b.getY()) && (this.getY()+this.getH()*7/8<b.getY()+b.getH())) {
-				if((this.getX()+this.getW()+this.getXv()>b.getX()) && (this.getX()+this.getW()+this.getXv()<b.getX()+b.getW())) {
-					return true;
-				}
-			}
-			break;
-		}		
-		return false;
-	}
 	
 	
 }

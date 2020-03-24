@@ -4,18 +4,23 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
 
 import cor.Looper;
 import gpy.Cycler;
+import inp.Button;
+import stt.BUTTON_ID;
 
 public class Drawer {
 	
 	private Canvas canvas;
 	private Cycler cycler;
+	private ArrayList<Button> buttons;
 	
-	public Drawer(Canvas canvas, Cycler cycler) {
+	public Drawer(Canvas canvas, Cycler cycler, ArrayList<Button> buttons) {
 		this.canvas = canvas;
 		this.cycler = cycler;
+		this.buttons = buttons;
 	}
 
 	public void draw() {
@@ -37,14 +42,18 @@ public class Drawer {
 		case HELP:
 			helpDraw(g);
 			break;
-		case GAME:
-			gameDraw(g);
+		case BATTLE2D:
+			battle2DDraw(g);
 			break;
 		}
 	}
 	
 	private void startDraw(Graphics g) {
-
+		g.setColor(Color.black);
+		g.fillRect(0, 0, Looper.WIDTH, Looper.HEIGHT);
+		for(Button b: buttons) {
+			b.draw(g);
+		}
 	}
 	
 	private void helpDraw(Graphics g) {
@@ -53,16 +62,14 @@ public class Drawer {
 		 */
 	}
 	
-	private void gameDraw(Graphics g) {
-		g.setColor(Color.DARK_GRAY);
-		g.fillRect(0, 0, Looper.WIDTH, Looper.HEIGHT);
-		cycler.draw(g);
+	private void overworldDraw(Graphics g) {
+		
 	}
 	
 	private void battle2DDraw(Graphics g) {
-		/*todo
-		 * implement
-		 */
+		g.setColor(Color.CYAN);
+		g.fillRect(0, 0, Looper.WIDTH, Looper.HEIGHT);
+		cycler.draw(g);
 	
 	}
 }

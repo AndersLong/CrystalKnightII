@@ -1,12 +1,16 @@
 package cor;
 
 import java.awt.Canvas;
+import java.util.ArrayList;
 
+import fio.ImageLoader;
 import gfx.Drawer;
 import gfx.Updater;
 import gfx.Window;
 import gpy.Cycler;
+import inp.Button;
 import inp.KeyWatcher;
+import inp.Menu;
 import stt.GAME_STATE;
 
 
@@ -15,7 +19,10 @@ public class Looper implements Runnable{
 	public static GAME_STATE state;
 	private Cycler cycler;
 	private Drawer drawer;
+	private ImageLoader il;
 	private Updater updater;
+	private Menu mw;
+	private ArrayList<Button> buttons;
 	private boolean running;
 	private double pauseTime;
 	private Canvas canvas;
@@ -34,13 +41,18 @@ public class Looper implements Runnable{
 		this.canvas = new Canvas();
 		this.WIDTH = 640;
 		this.HEIGHT = 640;
-		this.state = GAME_STATE.GAME;
+		this.state = GAME_STATE.START;
+		buttons = new ArrayList<Button>();
 		cycler = new Cycler();
 		window = new Window(canvas,"CRYSTAL KNIGHT II",WIDTH,HEIGHT);
+		il = new ImageLoader();
+		il.init();
 		kw = new KeyWatcher();
+		mw = new Menu(buttons);
 		canvas.requestFocus();
 		canvas.addKeyListener(kw);
-		drawer = new Drawer(canvas,cycler);
+		canvas.addMouseListener(mw);
+		drawer = new Drawer(canvas,cycler,buttons);
 		updater = new Updater(cycler);
 	}
 
