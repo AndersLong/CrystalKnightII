@@ -7,6 +7,7 @@ import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 
 import cor.Looper;
+import fio.ImageLoader;
 import gpy.Cycler;
 import inp.Button;
 import stt.BUTTON_ID;
@@ -45,30 +46,35 @@ public class Drawer {
 		case BATTLE2D:
 			battle2DDraw(g);
 			break;
+		case OVERWORLD:
+			overworldDraw(g);
+			break;
 		}
 	}
 	
 	private void startDraw(Graphics g) {
-		g.setColor(Color.black);
-		g.fillRect(0, 0, Looper.WIDTH, Looper.HEIGHT);
+		g.drawImage(ImageLoader.startScrn,0,0,640,640,null);
 		for(Button b: buttons) {
 			b.draw(g);
 		}
 	}
 	
 	private void helpDraw(Graphics g) {
-		/*todo
-		 * implement
-		 */
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, 640, 640);
+		g.drawImage(ImageLoader.helpScrn,0,0,640,640,null);
+		for(Button b: buttons) {
+			b.draw(g);
+		}
 	}
 	
 	private void overworldDraw(Graphics g) {
-		
+		cycler.draw(g);
 	}
 	
 	private void battle2DDraw(Graphics g) {
-		g.setColor(Color.CYAN);
-		g.fillRect(0, 0, Looper.WIDTH, Looper.HEIGHT);
+		g.setColor(Color.MAGENTA);
+		g.fillRect(0, 0, 640, 640);
 		cycler.draw(g);
 	
 	}

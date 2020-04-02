@@ -16,7 +16,7 @@ public abstract class GameObject extends Locatable{
 	protected OBJ_ID id;
 	protected OBJ_STATE stt;
 	protected Rectangle battleCollider;
-	
+
 	public GameObject(int x, int y, int xv, int yv, Cycler cycler, OBJ_ID id) {
 		super(x, y);
 		this.xv = xv;
@@ -26,18 +26,18 @@ public abstract class GameObject extends Locatable{
 		this.stt = OBJ_STATE.NORM;
 	}
 
-	public GameObject(int x, int y, Cycler cycler, OBJ_ID id) {
+	public GameObject(int x, int y,Cycler cycler, OBJ_ID id) {
 		this(x, y, 0, 0, cycler, id);
 	}
-	
+
 	public abstract void update();
-	
+
 	public abstract void draw(Graphics g);
-	
+
 	public void drawImg(Graphics g, BufferedImage img) {
 		g.drawImage(img, x, y, w, h, null);
 	}
-	
+
 	public boolean touchingInstanceOf(OBJ_ID otherId,DIR side) {
 		for(GameObject b: cycler.getObjs()) {
 			if(b.getId()==otherId) {
@@ -48,8 +48,8 @@ public abstract class GameObject extends Locatable{
 		}
 		return false;
 	}
-	
-	private boolean touching(GameObject b,DIR side) {
+
+	public boolean touching(GameObject b,DIR side) {
 		switch(side) {
 		case DOWN:
 			if((this.getX()+this.getW()/8>b.getX()&&this.getX()+this.getW()/8<b.getX()+b.getW()) ||  
@@ -86,22 +86,28 @@ public abstract class GameObject extends Locatable{
 		}		
 		return false;
 	}
-	
-	public boolean battleCollideWith(OBJ_ID id) {
-		for(GameObject b: cycler.getObjs()) {
-			if(b.getId()==id) {
-				if(this.battleCollider.intersects(b.battleCollider)) {
-					return true;
-				}
-			}
+
+
+	public boolean isOWEnemy() {
+		if(this.getId() == OBJ_ID.OW_GOB1 || this.getId() == OBJ_ID.OW_BANDIT) {
+			return true;
+		}else {
+			return false;
 		}
-		return false;
 	}
-	
+
+	public boolean isBattleEnemy() {
+		if(this.getId() == OBJ_ID.GOBLIN1 || this.getId() == OBJ_ID.BANDIT) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+
 	public boolean isLcol() {
 		return lcol;
 	}
-	
+
 	public void setLcol(boolean lcol) {
 		this.lcol = lcol;
 	}
@@ -160,8 +166,15 @@ public abstract class GameObject extends Locatable{
 
 	public void setStt(OBJ_STATE stt) {
 		this.stt = stt;
-	}	
-	
+	}
+
+	public Rectangle getBattleCollider() {
+		return battleCollider;
+	}
+
+	public void setBattleCollider(Rectangle battleCollider) {
+		this.battleCollider = battleCollider;
+	}
 	
 	
 }

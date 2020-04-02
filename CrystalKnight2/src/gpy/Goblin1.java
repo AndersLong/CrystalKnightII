@@ -8,7 +8,7 @@ import fio.ImageLoader;
 import stt.DIR;
 
 public class Goblin1 extends GameObject{
-	
+
 	private DIR dir;
 	private int xvspd,animationTimer;
 
@@ -21,7 +21,7 @@ public class Goblin1 extends GameObject{
 		this.animationTimer = 40;
 		this.battleCollider = new Rectangle(x+w/4,y,w/2,h);
 	}
-	
+
 	public Goblin1(int x, int y, Cycler cycler, OBJ_ID id) {
 		this(x, y, 0, 0, cycler, id);
 	}
@@ -32,7 +32,7 @@ public class Goblin1 extends GameObject{
 		move();
 		collide();
 	}
-	
+
 	public void timer() {
 		if(animationTimer>0) {
 			animationTimer--;
@@ -40,8 +40,9 @@ public class Goblin1 extends GameObject{
 			animationTimer = 40;
 		}
 	}
-	
+
 	public void ai() {
+
 		if(dir == DIR.LEFT) {
 			this.xv = -this.xvspd;
 		}
@@ -55,22 +56,22 @@ public class Goblin1 extends GameObject{
 			dir = DIR.LEFT;
 		}
 	}
-	
-	
+
+
 	public void move() {
-		
+
 		if(!dcol) {
 			this.yv++;
 		}
-		
+
 		this.x += this.xv;
 		this.y += this.yv;
 		this.battleCollider.x += this.xv;
 		this.battleCollider.y += this.yv;
-		
+
 	}
-	
-	
+
+
 	public void collide() {
 		if(this.touchingInstanceOf(OBJ_ID.BLOCK, DIR.LEFT)) {
 			lcol = true;
@@ -121,15 +122,18 @@ public class Goblin1 extends GameObject{
 		}	
 		g.setColor(Color.RED);
 		g.drawRect(this.battleCollider.x, this.battleCollider.y, this.battleCollider.width, this.battleCollider.height);
-		
+
 		for(GameObject go: cycler.getObjs()) {
 			if(go.getId() == OBJ_ID.SWORD) {
-				if(this.battleCollider.intersects(go.battleCollider)) {
-					cycler.removeObject(this);
+				Sword s = (Sword)go;
+				if(s.getOwner().getId() == OBJ_ID.PLAYER) {
+					if(this.battleCollider.intersects(go.battleCollider)) {
+						cycler.removeObject(this);
+					}
 				}
 			}
 		}
 	}
 
-	
+
 }

@@ -49,6 +49,9 @@ public class Button extends Locatable{
 		case QUIT:
 			g.drawImage(ImageLoader.quitButton,x,y,w,h,null);
 			break;
+		case BACK:
+			g.drawImage(ImageLoader.quitButton,x,y,w,h,null);
+			break;
 			
 		}
 	}

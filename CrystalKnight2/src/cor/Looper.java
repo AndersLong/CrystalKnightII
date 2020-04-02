@@ -3,6 +3,7 @@ package cor;
 import java.awt.Canvas;
 import java.util.ArrayList;
 
+import fio.FileReader;
 import fio.ImageLoader;
 import gfx.Drawer;
 import gfx.Updater;
@@ -48,13 +49,14 @@ public class Looper implements Runnable{
 		il = new ImageLoader();
 		il.init();
 		kw = new KeyWatcher();
-		mw = new Menu(buttons);
+		mw = new Menu(buttons,cycler);
 		canvas.requestFocus();
 		canvas.addKeyListener(kw);
 		canvas.addMouseListener(mw);
 		drawer = new Drawer(canvas,cycler,buttons);
 		updater = new Updater(cycler);
 	}
+	
 
 	public void run() {
 		this.init();

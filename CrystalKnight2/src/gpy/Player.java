@@ -1,3 +1,4 @@
+
 package gpy;
 
 import java.awt.Color;
@@ -19,6 +20,7 @@ public class Player extends GameObject{
 	private int animationTimer, attackTimer, hitTimer;
 	private DIR dir;
 	private boolean alreadySwungSword;
+	private int stamina = 20;
 
 	/**
 	 * @param x
@@ -71,7 +73,8 @@ public class Player extends GameObject{
 	}
 	
 	public void attack() {
-		if(KeyWatcher.pressed.contains(' ') && !alreadySwungSword && !KeyWatcher.spaceAlreadyPressed) {
+		if(KeyWatcher.pressed.contains(' ') && !alreadySwungSword && !KeyWatcher.spaceAlreadyPressed && cycler.hud.getStamina() > 60) {
+			cycler.hud.decrementStamina(60);
 			cycler.removeObject(OBJ_ID.SWORD);
 			alreadySwungSword = true;
 			KeyWatcher.spaceAlreadyPressed = true;
@@ -84,10 +87,10 @@ public class Player extends GameObject{
 			xv = xv/2;
 			switch(dir) {
 			case LEFT:
-				cycler.addObject(x-48, y+16,xv,4,OBJ_ID.SWORD);
+				cycler.addSword(x-48, y+16,xv,0,this,attackTimer);
 				break;
 			case RIGHT:
-				cycler.addObject(x+64, y+16,xv,4, OBJ_ID.SWORD);
+				cycler.addSword(x+64, y+16,xv,0,this,attackTimer);
 				break;
 			}
 		
@@ -109,7 +112,6 @@ public class Player extends GameObject{
 			attackTimer--;
 		}
 		if(attackTimer == 0 && stt != OBJ_STATE.HIT) {
-			cycler.removeObject(OBJ_ID.SWORD);
 			stt = OBJ_STATE.NORM;
 			alreadySwungSword = false;
 		}
@@ -118,6 +120,9 @@ public class Player extends GameObject{
 		}
 		if(hitTimer == 0 && stt == OBJ_STATE.HIT) {
 			stt = OBJ_STATE.NORM;
+		}
+		if(this.stamina < this.cycler.hud.getMaxPlayerStamina()) {
+			this.cycler.hud.incrementStamina(1);
 		}
 	}
 
@@ -142,8 +147,9 @@ public class Player extends GameObject{
 		if(!KeyWatcher.pressed.contains('a') && !KeyWatcher.pressed.contains('d')) {
 			this.xv = 0;
 		}
-		if(KeyWatcher.pressed.contains('w') && dcol) {
+		if(KeyWatcher.pressed.contains('w') && dcol && cycler.hud.getStamina() > 40) {
 			this.yv = -jumpArc;
+			this.cycler.hud.decrementStamina(40);
 		}
 	}
 
@@ -168,54 +174,94 @@ public class Player extends GameObject{
 	 */
 	
 	public void collide() {
-		if(this.battleCollideWith(OBJ_ID.GOBLIN1)) {
-			if(this.touchingInstanceOf(OBJ_ID.GOBLIN1, DIR.LEFT)) {
-				stt = OBJ_STATE.HIT;
-				lcol = true;
-				xv = 5;
-				hitTimer = 10;
+		
+		if(this.x < 0 || this.x + this.w > 640) {
+			if(cycler.baddiesAllDead()) {
+				for(GameObject obj: cycler.getOw_chunk().getEnemies()) {
+					OW_Enemy e = (OW_Enemy)obj;
+					if(e.isHitPlayer()) {
+						cycler.getOw_chunk().getEnemies().remove(obj);
+					}
+				}
 			}
-		}else if(this.touchingInstanceOf(OBJ_ID.BLOCK, DIR.LEFT)) {
-			lcol = true;
-			xv = 0;
+			cycler.loadLevel();
 		}
-		else {
-			lcol = false;
+		for(GameObject obj: cycler.getObjs()) {
+			if(isHostile(obj)) {
+				if(this.battleCollider.intersects(obj.battleCollider)) {
+					if(hitTimer <= 0) {
+						if(cycler.hud.getHp() > 0) {
+							if(obj.getX() < this.x + this.w /2 ) {
+								this.dir = DIR.RIGHT;
+								this.xv = 5;
+							}else {
+								this.xv = -5;
+							}
+							this.stt = OBJ_STATE.HIT;
+							this.yv = -7;
+							this.hitTimer = 30;
+							this.attackTimer = 0;
+							this.alreadySwungSword = false;
+							this.cycler.hud.decrementHp(1);
+						}
+						if(this.cycler.hud.getHp() == 0) {
+							System.out.println("dead");
+						}
+					}
+				}
+			}	
 		}
-		if(this.battleCollideWith(OBJ_ID.GOBLIN1)) {
-			if(this.touchingInstanceOf(OBJ_ID.GOBLIN1, DIR.RIGHT)) {
-				stt = OBJ_STATE.HIT;
-				rcol = true;
-				xv = -5;
-				hitTimer = 10;
-			}
-		}else if(this.touchingInstanceOf(OBJ_ID.BLOCK, DIR.RIGHT)) {
-			rcol = true;
-			xv = 0;
+		if(this.touchingInstanceOf(OBJ_ID.BLOCK, DIR.LEFT)) {
+			this.lcol = true;
+			this.xv = 0;
+		}else {
+			this.lcol = false;
 		}
-		else {
-			rcol = false;
+		if(this.touchingInstanceOf(OBJ_ID.BLOCK, DIR.RIGHT)) {
+			this.rcol = true;
+			this.xv = 0;
+		}else {
+			this.rcol = false;
 		}
 		if(this.touchingInstanceOf(OBJ_ID.BLOCK, DIR.UP)) {
-			ucol = true;
-			yv = 0;
-		}
-		else {
-			ucol = false;
+			this.ucol = true;
+			this.yv = 0;
+		}else {
+			this.ucol = false;
 		}
 		if(this.touchingInstanceOf(OBJ_ID.BLOCK, DIR.DOWN)) {
-			dcol = true;
-			yv = 0;
+			this.dcol = true;
+			this.yv = 0;
+		}else {
+			this.dcol = false;
 		}
-		else {
-			dcol = false;
+	}
+	
+	public boolean isHostile(GameObject obj) {
+		switch(obj.getId()) {
+		case GOBLIN1:
+			return true;
+		case BANDIT:
+			return true;
+		case SWORD:
+			Sword sword = (Sword)obj;
+			if(sword.getOwner().getId() != this.id) {
+				return true;
+			}
+			break;
 		}
+		return false;
+	}
+	
+	public void hostileCollision() {
 		
 	}
+	
 
 	/**
 	 * Contains all the logical operators for the sub-draw logic methods
 	 */
+	
 	
 	public void draw(Graphics g) {
 		if(dir == DIR.RIGHT) {
